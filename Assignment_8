@@ -1,0 +1,438 @@
+
+Given two strings s1 and s2, return the lowest ASCII sum of deleted characters to make two strings equal.
+
+Example 1:
+
+Input: s1 = "sea", s2 = "eat"
+
+Output: 231
+
+Explanation: Deleting "s" from "sea" adds the ASCII value of "s" (115) to the sum.
+
+Deleting "t" from "eat" adds 116 to the sum.
+
+At the end, both strings are equal, and 115 + 116 = 231 is the minimum sum possible to achieve this.
+
+def minimum_ascii_sum(s1, s2):
+    # Create a 2D array to store the minimum ASCII sum of deleted characters
+    dp = [[0] * (len(s2) + 1) for _ in range(len(s1) + 1)]
+    
+    # Iterate through the strings from the end to the beginning
+    for i in range(len(s1) - 1, -1, -1):
+        for j in range(len(s2) - 1, -1, -1):
+            if s1[i] == s2[j]:
+                dp[i][j] = dp[i + 1][j + 1]
+            else:
+                dp[i][j] = min(ord(s1[i]) + dp[i + 1][j], ord(s2[j]) + dp[i][j + 1])
+    
+    # The minimum ASCII sum of deleted characters is stored in the top-left cell of the 2D array
+    return dp[0][0]
+​
+# Example usage
+s1 = "sea"
+s2 = "eat"
+print(minimum_ascii_sum(s1, s2))
+115
+-----------------------------------------------------------------------------------------------------------------------------------
+💡 Question 2
+
+Given a string s containing only three types of characters: '(', ')' and '*', return true if s is valid.
+
+The following rules define a valid string:
+
+Any left parenthesis '(' must have a corresponding right parenthesis ')'.
+Any right parenthesis ')' must have a corresponding left parenthesis '('.
+Left parenthesis '(' must go before the corresponding right parenthesis ')'.
+'*' could be treated as a single right parenthesis ')' or a single left parenthesis '(' or an empty string "".
+Example 1:
+
+Input: s = "()"
+
+Output:
+
+true
+
+def is_valid(s):
+    stack = []
+    for c in s:
+        if c == "(":
+            stack.append(")")
+        elif not stack or stack.pop() != c:
+            return False
+    return not stack
+​
+# Example usage
+s = "()"
+print(is_valid(s))
+True
+------------------------------------------------------------------------------------------------------------------------------------------
+💡 Question 3
+
+Given two strings word1 and word2, return the minimum number of steps required to make word1 and word2 the same.
+
+In one step, you can delete exactly one character in either string.
+
+Example 1:
+
+Input: word1 = "sea", word2 = "eat"
+
+Output: 2
+
+Explanation: You need one step to make "sea" to "ea" and another step to make "eat" to "ea".
+
+def min_steps(words, word):
+    m, n = len(words), len(word)
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    for i in range(1, m + 1):
+        dp[i][0] = i
+    for j in range(1, n + 1):
+        dp[0][j] = j
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if words[i - 1] == word[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1]
+            else:
+                dp[i][j] = 1 + min(dp[i - 1][j], dp[i][j - 1])
+    return dp[m][n]
+​
+# Example usage
+words = "sea"
+word = "eat"
+print(min_steps(words, word)) 
+​
+2
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+💡 Question 4
+
+You need to construct a binary tree from a string consisting of parenthesis and integers.
+
+The whole input represents a binary tree. It contains an integer followed by zero, one or two pairs of parenthesis. The integer represents the root's value and a pair of parenthesis contains a child binary tree with the same structure. You always start to construct the left child node of the parent first if it exists. Input: s = "4(2(3)(1))(6(5))"
+
+Output: [4,2,6,3,1,5]
+
+ANS:-class TreeNode { 
+     constructor(val) { 
+       this.val = val; 
+       this.left = null; 
+       this.right = null; 
+     } 
+   } 
+  
+   function constructTreeFromString(s) { 
+     if (!s || s.length === 0) { 
+       return null; 
+     } 
+  
+     // Find the value of the root node 
+     let i = 0; 
+     while (i < s.length && !isNaN(parseInt(s[i]))) { 
+       i++; 
+     } 
+     const rootVal = parseInt(s.substring(0, i)); 
+     const root = new TreeNode(rootVal); 
+  
+     // Recursive call for the left child 
+     let j = i; 
+     let openCount = 0; 
+     while (j < s.length) { 
+       if (s[j] === '(') { 
+         openCount++; 
+       } else if (s[j] === ')') { 
+         openCount--; 
+       } 
+  
+       if (openCount === 0) { 
+         break; 
+       } 
+  
+       j++; 
+     } 
+  
+     if (i < j) { 
+       root.left = constructTreeFromString(s.substring(i + 1, j)); 
+     } 
+  
+     // Recursive call for the right child 
+     if (j + 2 < s.length) { 
+       root.right = constructTreeFromString(s.substring(j + 2, s.length - 1)); 
+     } 
+  
+     return root; 
+   } 
+  
+   // Function to flatten the binary tree in preorder traversal 
+   function flattenTree(root) { 
+     if (!root) { 
+       return []; 
+     } 
+  
+     const result = [root.val]; 
+     const left = flattenTree(root.left); 
+     const right = flattenTree(root.right); 
+  
+     return result.concat(left, right); 
+   } 
+  
+   // Test the function 
+   const s = "4(2(3)(1))(6(5))"; 
+   const root = constructTreeFromString(s); 
+   const flattenedTree = flattenTree(root); 
+   console.log(flattenedTree);// 
+  Cell In[9], line 1
+    class TreeNode {
+                   ^
+SyntaxError: invalid syntax
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+💡 Question 5
+
+Given an array of characters chars, compress it using the following algorithm:
+
+Begin with an empty string s. For each group of consecutive repeating characters in chars:
+
+If the group's length is 1, append the character to s.
+Otherwise, append the character followed by the group's length.
+The compressed string s should not be returned separately, but instead, be stored in the input character array chars. Note that group lengths that are 10 or longer will be split into multiple characters in chars.
+
+After you are done modifying the input array, return the new length of the array.
+
+You must write an algorithm that uses only constant extra space.
+
+Example 1:
+
+Input: chars = ["a","a","b","b","c","c","c"]
+
+Output: Return 6, and the first 6 characters of the input array should be: ["a","2","b","2","c","3"]
+
+Explanation:
+
+The groups are "aa", "bb", and "ccc". This compresses to "a2b2c3".
+ANS:-function compressArray(chars) { 
+     let i = 0; // Pointer for reading characters 
+     let j = 0; // Pointer for writing characters 
+     let count = 0; // Count of consecutive repeating characters 
+  
+     while (i < chars.length) { 
+       const char = chars[i]; 
+       count = 0; 
+  
+       // Count the number of consecutive repeating characters 
+       while (i < chars.length && chars[i] === char) { 
+         count++; 
+         i++; 
+       } 
+  
+       // Write the character and its count to the modified array 
+       chars[j] = char; 
+       j++; 
+  
+       if (count > 1) { 
+         const countStr = count.toString(); 
+  
+         for (let k = 0; k < countStr.length; k++) { 
+           chars[j] = countStr[k]; 
+           j++; 
+         } 
+       } 
+     } 
+  
+     return j; 
+   } 
+  
+   // Test the function 
+   const chars = ["a","a","b","b","c","c","c"]; 
+   const newLength = compressArray(chars); 
+   console.log(newLength); // Output: 6 
+   console.log(chars.slice(0, newLength)); // Output: ["a", "2", "b", "2", "c", "3"]
+​=============================================================================================================================================================
+<aside>
+💡 **Question 6**
+​
+Given two strings s and p, return *an array of all the start indices of* p*'s anagrams in* s. You may return the answer in **any order**.
+​
+An **Anagram** is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
+​
+**Example 1:**
+​
+**Input:** s = "cbaebabacd", p = "abc"
+​
+**Output:** [0,6]
+​
+**Explanation:**
+​
+The substring with start index = 0 is "cba", which is an anagram of "abc".
+​
+The substring with start index = 6 is "bac", which is an anagram of "abc".
+​ANS:-function findAnagrams(s, p) { 
+     const result = []; 
+  
+     if (s.length < p.length) { 
+       return result; 
+     } 
+  
+     const pFreq = Array(26).fill(0); 
+     const windowFreq = Array(26).fill(0); 
+     const aCharCode = 'a'.charCodeAt(0); 
+  
+     // Count the frequencies of characters in p 
+     for (let i = 0; i < p.length; i++) { 
+       pFreq[p.charCodeAt(i) - aCharCode]++; 
+     } 
+  
+     let left = 0; 
+  
+     for (let right = 0; right < s.length; right++) { 
+       const rightChar = s.charCodeAt(right) - aCharCode; 
+  
+       // Add the current character to the window 
+       windowFreq[rightChar]++; 
+  
+       // Shrink the window until it's the same length as p 
+       while (right - left + 1 > p.length) { 
+         const leftChar = s.charCodeAt(left) - aCharCode; 
+  
+         // Remove the leftmost character from the window 
+         windowFreq[leftChar]--; 
+         left++; 
+       } 
+  
+       // Compare the frequencies of the current window with p 
+       if (right - left + 1 === p.length && frequenciesMatch(pFreq, windowFreq)) { 
+         result.push(left); 
+       } 
+     } 
+  
+     return result; 
+   } 
+  
+   // Helper function to compare two frequency arrays 
+   function frequenciesMatch(freq1, freq2) { 
+     for (let i = 0; i < freq1.length; i++) { 
+       if (freq1[i] !== freq2[i]) { 
+         return false; 
+       } 
+     } 
+     return true; 
+   } 
+  
+   // Test the function 
+   const s = "cbaebabacd"; 
+   const p = "abc"; 
+   const result = findAnagrams(s, p); 
+   console.log(result); // Output: [0, 6] 
+-----------------------------------------------------------------------------------------------------------------------
+​
+💡 Question 7
+
+Given an encoded string, return its decoded string.
+
+The encoding rule is: k[encoded_string], where the encoded_string inside the square brackets is being repeated exactly k times. Note that k is guaranteed to be a positive integer.
+
+You may assume that the input string is always valid; there are no extra white spaces, square brackets are well-formed, etc. Furthermore, you may assume that the original data does not contain any digits and that digits are only for those repeat numbers, k. For example, there will not be input like 3a or 2[4].
+
+The test cases are generated so that the length of the output will never exceed 105.
+
+Example 1:
+
+Input: s = "3[a]2[bc]"
+
+Output: "aaabcbc"
+ANS:- function decodeString(s) { 
+     const stack = []; 
+  
+     for (let i = 0; i < s.length; i++) { 
+       if (s[i] !== ']') { 
+         stack.push(s[i]); 
+       } else { 
+         // Find the encoded string inside the square brackets 
+         let encodedString = ''; 
+         while (stack[stack.length - 1] !== '[') { 
+           encodedString = stack.pop() + encodedString; 
+         } 
+         stack.pop(); // Remove the '[' character 
+  
+         // Find the repetition count 
+         let repetitionCount = ''; 
+         while (stack.length > 0 && !isNaN(stack[stack.length - 1])) { 
+           repetitionCount = stack.pop() + repetitionCount; 
+         } 
+         repetitionCount = parseInt(repetitionCount); 
+  
+         // Repeat the encoded string and push it back to the stack 
+         const repeatedString = encodedString.repeat(repetitionCount); 
+         for (let j = 0; j < repeatedString.length; j++) { 
+           stack.push(repeatedString[j]); 
+         } 
+       } 
+     } 
+  
+     // Construct the final decoded string 
+     let decodedString = ''; 
+     while (stack.length > 0) { 
+       decodedString = stack.pop() + decodedString; 
+     } 
+  
+     return decodedString; 
+   } 
+  
+   // Test the function 
+   const s = "3[a]2[bc]"; 
+   const decodedString = decodeString(s); 
+   console.log(decodedString); // Output: "aaabcbc" 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+​
+💡 Question 8
+
+Given two strings s and goal, return true if you can swap two letters in s so the result is equal to goal*, otherwise, return* false*.*
+
+Swapping letters is defined as taking two indices i and j (0-indexed) such that i != j and swapping the characters at s[i] and s[j].
+
+For example, swapping at indices 0 and 2 in "abcd" results in "cbad".
+Example 1:
+
+Input: s = "ab", goal = "ba"
+
+Output: true
+
+Explanation: You can swap s[0] = 'a' and s[1] = 'b' to get "ba", which is equal to goal.
+ANS:-  function stringsBuddy(s, goal) { 
+     if (s.length !== goal.length) { 
+       return false; 
+     } 
+  
+     if (s === goal) { 
+       const charCount = new Map(); 
+       for (let i = 0; i < s.length; i++) { 
+         if (charCount.has(s[i])) { 
+           return true; 
+         } 
+         charCount.set(s[i], true); 
+       } 
+       return false; 
+     } 
+  
+     const diffPositions = []; 
+     for (let i = 0; i < s.length; i++) { 
+       if (s[i] !== goal[i]) { 
+         diffPositions.push(i); 
+       } 
+       if (diffPositions.length > 2) { 
+         return false; 
+       } 
+     } 
+  
+     if (diffPositions.length !== 2) { 
+       return false; 
+     } 
+  
+     const [pos1, pos2] = diffPositions; 
+     return s[pos1] === goal[pos2] && s[pos2] === goal[pos1]; 
+   } 
+  
+   // Test the function 
+   const s = "ab"; 
+   const goal = "ba"; 
+   const result = stringsBuddy(s, goal); 
+   conconsole.log(result);  
+   // Output: true
